@@ -47,7 +47,9 @@ telnetd
 
 #### Proof of Concept
 
-The exploit is simple:
+We just need to write a .sh script to the SD card and name it update.nor.sh.
+
+The exploit I choose is :
 
 ```sh
 #!/bin/sh
