@@ -26,6 +26,19 @@ SENSOR_ISP_HOOK=$SDC_DIR/ISP/*t23.bin
 WHERE_COREDMP="/mnt/sdc/coredmp"
 WHERE_EXEC="/usr/local/bin/doraemon"
 ```
+The section `local/sbin/start_app.sh:50–99` blindly trusts any file named **`update.nor.sh`** located on the SD card. During the boot process, the script:
+
+- mounts the SD card,
+- copies `update.nor.sh` to `/tmp/update.nor.sh`,
+- performs **no validation** of its contents, integrity, permissions, or ownership.
+
+Later in the startup sequence (`local/sbin/start_app.sh:108–129`), the copied file is:
+
+- marked as executable,
+- run **as root**,  
+- executed with the SD card’s mount point passed as an argument.
+
+This execution occurs **before the main `ipc_service` starts**, meaning the script runs in a **highest-privilege environment** where networking utilities, watchdog functions, and upgrade helpers are already available.
 
 #### Available Utilities
 
@@ -70,13 +83,3 @@ date > /tmp/exploit_time
 We connect via telnet:
 
 ![alt text](image.png)
-
-
-## Conclusion
-
-The device’s boot sequence reveals a systemic security gap rooted in unconditional trust of external and persistent storage. During startup, the system automatically mounts an SD card and executes any file named `update.nor.sh` with full root privileges, without performing integrity checks, authentication, or signature validation. This behavior effectively transforms removable media into an implicit root-level execution channel. Because this execution occurs before key services and safeguards are initialized, a malicious script can freely modify system behavior, disable protections, or extract sensitive information.
-
-In parallel, the startup routine also executes `/mnt/config/hook-boot.sh` whenever present, again with no validation. Once an attacker gains initial code execution—via physical access, manipulated supply-chain media, or other vectors—they can write to the configuration partition and achieve seamless persistence across reboots. This makes the device highly susceptible to long-term compromise through a single dropped file.
-
-Together, these design choices create a cascade of high-impact risks: trivial privilege escalation, pre-boot tampering, and durable persistence without requiring exploitation of system binaries or network exposure. As a result, anyone with access to removable storage or the configuration partition can subvert the entire security model of the device, implanting backdoors or disabling critical mechanisms with minimal effort. Addressing this vulnerability requires enforcing strict validation, limiting automatic code execution, and hardening the boot process against untrusted inputs.
-
