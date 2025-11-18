@@ -1,6 +1,6 @@
 ---
 title: "Vulnerability Report: LSC Smart Connect Camera"
-date: 2024-02-15
+date: 2025-11-05
 description: "Abusing the SD-card update hook to spawn remote shells on LSC Smart Connect cameras."
 tags:
   - iot
