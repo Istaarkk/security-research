@@ -1,6 +1,6 @@
 ---
 title: "Vulnerability Report: LSC Smart Connect Camera"
-date: 2025-11-05
+date: 2024-02-15
 description: "Abusing the SD-card update hook to spawn remote shells on LSC Smart Connect cameras."
 tags:
   - iot
@@ -10,7 +10,7 @@ tags:
 
 ### Vulnerability Report on LSC Smart Connect Camera
 
-The vulnerability found consists of exploiting the update system in `app_start.sh`, more precisely via the SD card mount and the `update.nor.sh` file.
+The vulnerability found consists of exploiting the update system in `start_app.sh`, more precisely via the SD card mount and the `update.nor.sh` file.
 
 #### Configuration Variables
 
@@ -79,6 +79,10 @@ cp /mnt/update.nor.sh /mnt/config/hook-boot.sh
 
 date > /tmp/exploit_time
 ```
+
+We confirm that the port is open.
+
+![alt text](netstat.png)
 
 We connect via telnet:
 
